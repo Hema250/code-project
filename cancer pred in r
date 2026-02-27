@@ -1,0 +1,26 @@
+library(mlbench)
+library(rpart)
+library(rpart.plot)
+
+data(BreastCancer)
+
+BreastCancer$Id <- NULL
+BreastCancer <- na.omit(BreastCancer)
+BreastCancer$Class <- as.factor(BreastCancer$Class)
+
+set.seed(123)
+index <- sample(1:nrow(BreastCancer), 0.7*nrow(BreastCancer))
+train_data <- BreastCancer[index, ]
+test_data  <- BreastCancer[-index, ]
+
+dt_model <- rpart(Class ~ ., data = train_data, method = "class")
+
+rpart.plot(dt_model)
+
+predictions <- predict(dt_model, test_data, type = "class")
+
+confusion_matrix <- table(predictions, test_data$Class)
+print(confusion_matrix)
+
+accuracy <- sum(diag(confusion_matrix)) / sum(confusion_matrix)
+cat("Accuracy:", accuracy*100, "%\n")  
